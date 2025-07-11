@@ -106,6 +106,7 @@ _Note_: Use `--redis-url` to specify address, db-number, and password with one f
 | `--redis-db`(int)                 | `REDIS_DB`                | redis database number                                                                                                        | 0                |
 | `--redis-password`(string)        | `REDIS_PASSWORD`          | password to use when connecting to redis server                                                                              | ""               |
 | `--redis-cluster-nodes`(string)   | `REDIS_CLUSTER_NODES`     | comma separated list of host:port addresses of cluster nodes                                                                 | ""               |
+| `--redis-namespace`(string)       | `REDIS_NAMESPACE`         | redis key namespace for asynq (e.g., 'app' will prefix keys with 'app:')                                                    | ""               |
 | `--redis-tls`(string)             | `REDIS_TLS`               | server name for TLS validation used when connecting to redis server                                                          | ""               |
 | `--redis-insecure-tls`(bool)      | `REDIS_INSECURE_TLS`      | disable TLS certificate host checks                                                                                          | false            |
 | `--enable-metrics-exporter`(bool) | `ENABLE_METRICS_EXPORTER` | enable prometheus metrics exporter to expose queue metrics                                                                   | false            |
@@ -139,6 +140,30 @@ Example:
 ```sh
 $ ./asynqmon --redis-cluster-nodes=localhost:7000,localhost:7001,localhost:7002,localhost:7003,localhost:7004,localhost:7006
 ```
+
+### Using Redis Namespace
+
+Asynqmon supports Redis key namespacing to isolate different applications or environments using the same Redis instance.
+When you specify a namespace, all Redis keys will be prefixed with `<namespace>:asynq:` instead of just `asynq:`.
+
+Example:
+
+```sh
+# Without namespace - keys use default "asynq:" prefix
+$ ./asynqmon --redis-addr=localhost:6379
+
+# With namespace "app" - keys use "app:asynq:" prefix
+$ ./asynqmon --redis-addr=localhost:6379 --redis-namespace=app
+
+# Using environment variable
+$ export REDIS_NAMESPACE=production
+$ ./asynqmon --redis-addr=localhost:6379
+```
+
+This is useful when:
+- Multiple applications share the same Redis instance
+- You want to separate development, staging, and production environments
+- You need to isolate different services or tenants
 
 ### Integration with Prometheus
 
@@ -210,6 +235,7 @@ func main() {
 	h := asynqmon.New(asynqmon.Options{
 		RootPath: "/monitoring", // RootPath specifies the root for asynqmon app
 		RedisConnOpt: asynq.RedisClientOpt{Addr: ":6379"},
+		Namespace: "myapp", // Optional: Redis key namespace
 	})
 
     // Note: We need the tailing slash when using net/http.ServeMux.
@@ -238,6 +264,7 @@ func main() {
 	h := asynqmon.New(asynqmon.Options{
 		RootPath: "/monitoring", // RootPath specifies the root for asynqmon app
 		RedisConnOpt: asynq.RedisClientOpt{Addr: ":6379"},
+		Namespace: "myapp", // Optional: Redis key namespace
 	})
 
 	r := mux.NewRouter()

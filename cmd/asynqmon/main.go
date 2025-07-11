@@ -33,6 +33,7 @@ type Config struct {
 	RedisURL          string
 	RedisInsecureTLS  bool
 	RedisClusterNodes string
+	RedisNamespace    string
 
 	// UI related configs
 	ReadOnly         bool
@@ -67,6 +68,7 @@ func parseFlags(progname string, args []string) (cfg *Config, output string, err
 	flags.StringVar(&conf.RedisURL, "redis-url", getEnvDefaultString("REDIS_URL", ""), "URL to redis server")
 	flags.BoolVar(&conf.RedisInsecureTLS, "redis-insecure-tls", getEnvOrDefaultBool("REDIS_INSECURE_TLS", false), "disable TLS certificate host checks")
 	flags.StringVar(&conf.RedisClusterNodes, "redis-cluster-nodes", getEnvDefaultString("REDIS_CLUSTER_NODES", ""), "comma separated list of host:port addresses of cluster nodes")
+	flags.StringVar(&conf.RedisNamespace, "redis-namespace", getEnvDefaultString("REDIS_NAMESPACE", ""), "redis key namespace for asynq (e.g., 'app' will prefix keys with 'app:')")
 	flags.IntVar(&conf.MaxPayloadLength, "max-payload-length", getEnvOrDefaultInt("MAX_PAYLOAD_LENGTH", 200), "maximum number of utf8 characters printed in the payload cell in the Web UI")
 	flags.IntVar(&conf.MaxResultLength, "max-result-length", getEnvOrDefaultInt("MAX_RESULT_LENGTH", 200), "maximum number of utf8 characters printed in the result cell in the Web UI")
 	flags.BoolVar(&conf.EnableMetricsExporter, "enable-metrics-exporter", getEnvOrDefaultBool("ENABLE_METRICS_EXPORTER", false), "enable prometheus metrics exporter to expose queue metrics")
@@ -153,6 +155,7 @@ func main() {
 		ResultFormatter:   asynqmon.ResultFormatterFunc(resultFormatterFunc(cfg)),
 		PrometheusAddress: cfg.PrometheusServerAddr,
 		ReadOnly:          cfg.ReadOnly,
+		Namespace:         cfg.RedisNamespace,
 	})
 	defer h.Close()
 
@@ -165,7 +168,12 @@ func main() {
 		// Using NewPedanticRegistry here to test the implementation of Collectors and Metrics.
 		reg := prometheus.NewPedanticRegistry()
 
-		inspector := asynq.NewInspector(redisConnOpt)
+		var inspector *asynq.Inspector
+		if cfg.RedisNamespace != "" {
+			inspector = asynq.NewInspectorWithNamespace(redisConnOpt, cfg.RedisNamespace)
+		} else {
+			inspector = asynq.NewInspector(redisConnOpt)
+		}
 
 		reg.MustRegister(
 			metrics.NewQueueMetricsCollector(inspector),

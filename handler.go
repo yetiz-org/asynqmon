@@ -42,6 +42,12 @@ type Options struct {
 
 	// Set ReadOnly to true to restrict user to view-only mode.
 	ReadOnly bool
+
+	// Namespace specifies the Redis key namespace for asynq.
+	// If provided, all Redis keys will be prefixed with "<namespace>:".
+	//
+	// This field is optional.
+	Namespace string
 }
 
 // HTTPHandler is a http.Handler for asynqmon application.
@@ -64,7 +70,13 @@ func New(opts Options) *HTTPHandler {
 	if !ok {
 		panic(fmt.Sprintf("asnyqmon.New: unsupported RedisConnOpt type %T", opts.RedisConnOpt))
 	}
-	i := asynq.NewInspector(opts.RedisConnOpt)
+
+	var i *asynq.Inspector
+	if opts.Namespace != "" {
+		i = asynq.NewInspectorWithNamespace(opts.RedisConnOpt, opts.Namespace)
+	} else {
+		i = asynq.NewInspector(opts.RedisConnOpt)
+	}
 
 	// Make sure that RootPath starts with a slash if provided.
 	if opts.RootPath != "" && !strings.HasPrefix(opts.RootPath, "/") {
