@@ -7,8 +7,8 @@ import (
 	"strings"
 
 	"github.com/gorilla/mux"
-	"github.com/hibiken/asynq"
 	"github.com/redis/go-redis/v9"
+	"github.com/yetiz-org/asynq"
 )
 
 // Options are used to configure HTTPHandler.

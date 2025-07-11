@@ -4,7 +4,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/hibiken/asynq"
+	"github.com/yetiz-org/asynq"
 	"github.com/yetiz-org/asynqmon"
 )
 

@@ -1,10 +1,10 @@
 <img src="https://user-images.githubusercontent.com/11155743/114745460-57760500-9d57-11eb-9a2c-43fa88171807.png" alt="Asynqmon logo" width="360px" />
 
-# Web UI for monitoring & administering [Asynq](https://github.com/hibiken/asynq) task queue
+# Web UI for monitoring & administering [Asynq](https://github.com/yetiz-org/asynq) task queue
 
 ## Overview
 
-Asynqmon is a web UI tool for monitoring and administering [Asynq](https://github.com/hibiken/asynq) queues and tasks.
+Asynqmon is a web UI tool for monitoring and administering [Asynq](https://github.com/yetiz-org/asynq) queues and tasks.
 It supports integration with [Prometheus](https://prometheus.io) to display time-series data.
 
 Asynqmon is both a library that you can include in your web application, as well as a binary that you can simply install and run.
@@ -101,7 +101,7 @@ _Note_: Use `--redis-url` to specify address, db-number, and password with one f
 | Flag                              | Env                       | Description                                                                                                                  | Default          |
 | --------------------------------- | ------------------------- | ---------------------------------------------------------------------------------------------------------------------------- | ---------------- |
 | `--port`(int)                     | `PORT`                    | port number to use for web ui server                                                                                         | 8080             |
-| `---redis-url`(string)            | `REDIS_URL`               | URL to redis or sentinel server. See [godoc](https://pkg.go.dev/github.com/hibiken/asynq#ParseRedisURI) for supported format | ""               |
+| `---redis-url`(string)            | `REDIS_URL`               | URL to redis or sentinel server. See [godoc](https://pkg.go.dev/github.com/yetiz-org/asynq#ParseRedisURI) for supported format | ""               |
 | `--redis-addr`(string)            | `REDIS_ADDR`              | address of redis server to connect to                                                                                        | "127.0.0.1:6379" |
 | `--redis-db`(int)                 | `REDIS_DB`                | redis database number                                                                                                        | 0                |
 | `--redis-password`(string)        | `REDIS_PASSWORD`          | password to use when connecting to redis server                                                                              | ""               |
@@ -202,7 +202,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/hibiken/asynq"
+	"github.com/yetiz-org/asynq"
 	"github.com/yetiz-org/asynqmon"
 )
 
@@ -230,7 +230,7 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	"github.com/hibiken/asynq"
+	"github.com/yetiz-org/asynq"
 	"github.com/yetiz-org/asynqmon"
 )
 
@@ -261,7 +261,7 @@ package main
 
 import (
 	"github.com/labstack/echo/v4"
-	"github.com/hibiken/asynq"
+	"github.com/yetiz-org/asynq"
 	"github.com/yetiz-org/asynqmon"
 )
 
@@ -284,4 +284,4 @@ func main() {
 
 ## License
 
-Copyright (c) 2019-present [Ken Hibino](https://github.com/hibiken) and [Contributors](https://github.com/yetiz-org/asynqmon/graphs/contributors). `Asynqmon` is free and open-source software licensed under the [MIT License](https://github.com/hibiken/asynq/blob/master/LICENSE). Official logo was created by [Vic Shóstak](https://github.com/koddr) and distributed under [Creative Commons](https://creativecommons.org/publicdomain/zero/1.0/) license (CC0 1.0 Universal).
+Copyright (c) 2019-present [Ken Hibino](https://github.com/hibiken) and [Contributors](https://github.com/yetiz-org/asynqmon/graphs/contributors). `Asynqmon` is free and open-source software licensed under the [MIT License](https://github.com/yetiz-org/asynq/blob/master/LICENSE). Official logo was created by [Vic Shóstak](https://github.com/koddr) and distributed under [Creative Commons](https://creativecommons.org/publicdomain/zero/1.0/) license (CC0 1.0 Universal).

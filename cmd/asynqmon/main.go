@@ -12,11 +12,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/hibiken/asynq"
-	"github.com/hibiken/asynq/x/metrics"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/rs/cors"
+	"github.com/yetiz-org/asynq"
+	"github.com/yetiz-org/asynq/x/metrics"
 	"github.com/yetiz-org/asynqmon"
 )
 
