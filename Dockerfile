@@ -12,7 +12,8 @@ WORKDIR /static
 ENV NODE_OPTIONS=--openssl-legacy-provider
 # Install npm (with latest nodejs) and yarn (globally, in silent mode).
 RUN apk add --update nodejs npm && \
-    npm i -g -s --unsafe-perm yarn
+    npm i -g -s --unsafe-perm yarn && \
+    yarn config set registry https://registry.npmmirror.com
 
 # Copy only ./ui folder to the working directory.
 COPY ui .
