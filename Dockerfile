@@ -3,7 +3,7 @@
 # Building a frontend.
 #
 
-FROM alpine:3.17 AS frontend
+FROM alpine:3.19 AS frontend
 
 # Move to a working directory (/static).
 WORKDIR /static
@@ -12,8 +12,8 @@ WORKDIR /static
 ENV NODE_OPTIONS=--openssl-legacy-provider
 # Install npm (with latest nodejs) and yarn (globally, in silent mode).
 RUN apk add --update nodejs npm && \
-    npm i -g -s --unsafe-perm yarn && \
-    yarn config set registry https://registry.npmmirror.com
+    npm i -g -s yarn && \
+    yarn config set network-timeout 300000
 
 # Copy only ./ui folder to the working directory.
 COPY ui .
