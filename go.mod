@@ -10,8 +10,8 @@ require (
 	github.com/prometheus/client_golang v1.20.5
 	github.com/redis/go-redis/v9 v9.11.0
 	github.com/rs/cors v1.7.0
-	github.com/yetiz-org/asynq v0.28.1
-	github.com/yetiz-org/asynq/x v0.0.0-20250711050252-1d79c183666c
+	github.com/yetiz-org/asynq v0.29.1
+	github.com/yetiz-org/asynq/x v0.0.0-20250712082012-578746303a16
 )
 
 require (
