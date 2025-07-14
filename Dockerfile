@@ -52,12 +52,15 @@ RUN go build -ldflags="-s -w" -o asynqmon ./cmd/asynqmon
 
 #
 # Third stage: 
-# Creating and running a new scratch container with the backend binary.
+# Creating and running a minimal Alpine container with the backend binary.
 #
 
-FROM scratch
+FROM alpine:3.19
 
-# Copy binary from /build to the root folder of the scratch container.
+# Install curl
+RUN apk add --no-cache curl
+
+# Copy binary from /build to the root folder of the container.
 COPY --from=backend ["/build/asynqmon", "/"]
 
 # Command to run when starting the container.
