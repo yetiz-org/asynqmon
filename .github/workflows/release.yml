@@ -39,6 +39,8 @@ jobs:
           node-version: '20'
 
       - name: Install NPM packages and build UI
+        env:
+          NODE_OPTIONS: --openssl-legacy-provider
         run: |
           cd ui
           yarn install
