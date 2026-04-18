@@ -101,7 +101,7 @@ _Note_: Use `--redis-url` to specify address, db-number, and password with one f
 | Flag                              | Env                       | Description                                                                                                                  | Default          |
 | --------------------------------- | ------------------------- | ---------------------------------------------------------------------------------------------------------------------------- | ---------------- |
 | `--port`(int)                     | `PORT`                    | port number to use for web ui server                                                                                         | 8080             |
-| `---redis-url`(string)            | `REDIS_URL`               | URL to redis or sentinel server. See [godoc](https://pkg.go.dev/github.com/yetiz-org/asynq#ParseRedisURI) for supported format | ""               |
+| `--redis-url`(string)             | `REDIS_URL`               | URL to redis or sentinel server. See [godoc](https://pkg.go.dev/github.com/yetiz-org/asynq#ParseRedisURI) for supported format | ""               |
 | `--redis-addr`(string)            | `REDIS_ADDR`              | address of redis server to connect to                                                                                        | "127.0.0.1:6379" |
 | `--redis-db`(int)                 | `REDIS_DB`                | redis database number                                                                                                        | 0                |
 | `--redis-password`(string)        | `REDIS_PASSWORD`          | password to use when connecting to redis server                                                                              | ""               |
@@ -145,6 +145,7 @@ $ ./asynqmon --redis-cluster-nodes=localhost:7000,localhost:7001,localhost:7002,
 
 Asynqmon supports Redis key namespacing to isolate different applications or environments using the same Redis instance.
 When you specify a namespace, all Redis keys will be prefixed with `<namespace>:asynq:` instead of just `asynq:`.
+You can configure the namespace with either `--redis-namespace` or `REDIS_NAMESPACE`. When both are provided, the flag value takes precedence.
 
 Example:
 
@@ -158,6 +159,20 @@ $ ./asynqmon --redis-addr=localhost:6379 --redis-namespace=app
 # Using environment variable
 $ export REDIS_NAMESPACE=production
 $ ./asynqmon --redis-addr=localhost:6379
+
+# Flag value overrides the environment variable
+$ REDIS_NAMESPACE=production ./asynqmon --redis-addr=localhost:6379 --redis-namespace=staging
+```
+
+Docker example:
+
+```sh
+docker run --rm \
+    --name asynqmon \
+    -p 8080:8080 \
+    -e REDIS_ADDR=host.docker.internal:6379 \
+    -e REDIS_NAMESPACE=production \
+    yetizorg/asynqmon
 ```
 
 This is useful when:
@@ -190,14 +205,14 @@ The address can be specified via `--prometheus-addr`. This enables the metrics v
 docker run --rm \
     --name asynqmon \
     -p 3000:3000 \
-    yetizorg/asynqmon --port=3000 --redis-addr=host.docker.internal:6380
+    yetizorg/asynqmon --port=3000 --redis-addr=host.docker.internal:6380 --redis-namespace=production
 
 # with Docker (connect to a Redis server running in the Docker container)
 docker run --rm \
     --name asynqmon \
     --network dev-network \
     -p 8080:8080 \
-    yetizorg/asynqmon --redis-addr=dev-redis:6379
+    yetizorg/asynqmon --redis-addr=dev-redis:6379 --redis-namespace=worker
 ```
 
 Next, go to [localhost:8080](http://localhost:8080) and see Asynqmon dashboard:
@@ -302,6 +317,7 @@ func main() {
 			Password: "",
 			DB: 0,
 		},
+		Namespace: "myapp",
 	})
 	e.Any("/monitoring/tasks/*", echo.WrapHandler(mon))
 	e.Start(":8080")

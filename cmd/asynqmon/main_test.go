@@ -2,7 +2,6 @@ package main
 
 import (
 	"crypto/tls"
-	"strings"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
@@ -12,10 +11,13 @@ import (
 
 func TestParseFlags(t *testing.T) {
 	tests := []struct {
+		name string
 		args []string
+		env  map[string]string
 		want *Config
 	}{
 		{
+			name: "parses redis address and db flags",
 			args: []string{"--redis-addr", "localhost:6380", "--redis-db", "3"},
 			want: &Config{
 				RedisAddr: "localhost:6380",
@@ -37,10 +39,82 @@ func TestParseFlags(t *testing.T) {
 				Args: []string{},
 			},
 		},
+		{
+			name: "parses redis namespace flag",
+			args: []string{"--redis-namespace", "app"},
+			want: &Config{
+				Port:                  8080,
+				RedisAddr:             "127.0.0.1:6379",
+				RedisDB:               0,
+				RedisPassword:         "",
+				RedisTLS:              "",
+				RedisURL:              "",
+				RedisInsecureTLS:      false,
+				RedisClusterNodes:     "",
+				RedisNamespace:        "app",
+				MaxPayloadLength:      200,
+				MaxResultLength:       200,
+				EnableMetricsExporter: false,
+				PrometheusServerAddr:  "",
+				ReadOnly:              false,
+				Args:                  []string{},
+			},
+		},
+		{
+			name: "reads redis namespace from environment",
+			env: map[string]string{
+				"REDIS_NAMESPACE": "production",
+			},
+			want: &Config{
+				Port:                  8080,
+				RedisAddr:             "127.0.0.1:6379",
+				RedisDB:               0,
+				RedisPassword:         "",
+				RedisTLS:              "",
+				RedisURL:              "",
+				RedisInsecureTLS:      false,
+				RedisClusterNodes:     "",
+				RedisNamespace:        "production",
+				MaxPayloadLength:      200,
+				MaxResultLength:       200,
+				EnableMetricsExporter: false,
+				PrometheusServerAddr:  "",
+				ReadOnly:              false,
+				Args:                  nil,
+			},
+		},
+		{
+			name: "flag overrides redis namespace environment",
+			args: []string{"--redis-namespace", "staging"},
+			env: map[string]string{
+				"REDIS_NAMESPACE": "production",
+			},
+			want: &Config{
+				Port:                  8080,
+				RedisAddr:             "127.0.0.1:6379",
+				RedisDB:               0,
+				RedisPassword:         "",
+				RedisTLS:              "",
+				RedisURL:              "",
+				RedisInsecureTLS:      false,
+				RedisClusterNodes:     "",
+				RedisNamespace:        "staging",
+				MaxPayloadLength:      200,
+				MaxResultLength:       200,
+				EnableMetricsExporter: false,
+				PrometheusServerAddr:  "",
+				ReadOnly:              false,
+				Args:                  []string{},
+			},
+		},
 	}
 
 	for _, tc := range tests {
-		t.Run(strings.Join(tc.args, " "), func(t *testing.T) {
+		t.Run(tc.name, func(t *testing.T) {
+			for key, value := range tc.env {
+				t.Setenv(key, value)
+			}
+
 			cfg, output, err := parseFlags("asynqmon", tc.args)
 			if err != nil {
 				t.Errorf("parseFlags returned error: %v", err)
@@ -53,7 +127,6 @@ func TestParseFlags(t *testing.T) {
 			}
 		})
 	}
-
 }
 
 func TestMakeRedisConnOpt(t *testing.T) {
@@ -106,7 +179,7 @@ func TestMakeRedisConnOpt(t *testing.T) {
 				MasterName: "mymaster",
 				SentinelAddrs: []string{
 					"localhost:5000", "localhost:5001", "localhost:5002"},
-				Password: "secretpassword", // FIXME: Shouldn't this be SentinelPassword instead?
+				SentinelPassword: "secretpassword",
 			},
 		},
 		{

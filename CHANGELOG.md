@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- (cmd): Added test coverage for `--redis-namespace` and `REDIS_NAMESPACE`
+- (docs): Expanded README examples for Redis namespace usage in binary, Docker, and library integrations
+- (pkg): Added namespace usage to the HTTP handler example
+
 ## [0.7.0] - 2022-04-11
 
 Version 0.7 added support for [Task Aggregation](https://github.com/yetiz-org/asynq/wiki/Task-aggregation) feature
